@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>注册页面</title>
+	<link rel="stylesheet" href="/css/reset.css">
+	<link rel="stylesheet" href="./../css/common.css">
+	<link rel="stylesheet" href="/css/lr.css">
+</head>
+<body>
+	<div id="header">
+		<div class="contaienr"></div>
+	</div>
+	<div id="content">
+		<div class="container">
+			<form action="/regist" method="post" enctype="multipart/form-data">
+				<div class="username">
+					<p class="label">
+						<label for="username">用户名称</label>
+					</p>
+					<p class="input">
+						<input type="text" id="username" name="username">
+					</p>
+				</div>
+				<div class="password">
+					<p class="label">
+						<label for="password">密码</label>
+					</p>
+					<p class="input">
+						<input type="password" id="password" name="password">
+					</p>
+				</div>
+				<div class="repeat_password">
+					<p class="label">
+						<label for="repeat_password">密码</label>
+					</p>
+					<p class="input">
+						<input type="password" id="repeat_password">
+					</p>
+				</div>
+				<div class="head_pic">
+					<p class="label">
+						<label for="">上传头像</label>
+					</p>
+					<p class="input">
+						<input type="file" name="head_pic">
+					</p>
+				</div>
+				<div class="submit">
+					<button id="submit">提交</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div id="footer">
+		<div class="container"></div>
+	</div>
+	<script type="text/javascript" src="/js/jquery-1.7.2.js"></script>
+	<script type="text/javascript">
+		// 当dom结构加载完毕的时候再去执行内容
+		$(function(){
+			// 获取元素
+			// 获取用户名元素
+			var $username = $("#username");
+			var $username_lock = false;
+			// 获取密码元素
+			var $password = $("#password");
+			var $password_lock = false;
+			// 获取重复密码元素
+			var $repeat_password = $("#repeat_password");
+			// 获取提交按钮
+			var $submit = $("#submit");
+			// 添加事件
+			// 当用户输入用户名完毕之后 检测 是否符合规则 如果符合 则发送ajax验证 如果不符合则停止执行
+			$username.blur(function(){
+				// 获取当前用户输入的内容
+				var val = $(this).val();
+				// 使用正则表达式验证输入的是否合规则
+				var reg = /^[a-zA-Z]\w{5,9}$/;
+				// 验证
+				if(!reg.test(val)){
+					// 说明不符合验证
+					$username_lock = false;
+					return;
+				}
+				// 发送ajax
+				$.ajax({
+					url: "/check_username",
+					type: "get",
+					data: {
+						username: val
+					},
+					dataType: "json",
+					success: function(data){
+						if(!data.error){
+							$username_lock = true;
+						}else{
+							$username_lock = false;
+						}
+					}
+				});
+			});
+			// 当用户填写第一个密码的时候 只需要检测正则表达式即可
+			$password.blur(function(){
+				// 获取填写的密码
+				var val = $(this).val();
+				// 定义正则表达式
+				var reg = /^\w{8,12}$/;
+				if(!reg.test(val)){
+					$(this).val("");
+				}
+			});
+			// 当用户填写完第二个密码的时候 并且密码与第一次填写相同 才能够开锁
+			$repeat_password.blur(function(){
+				var val = $(this).val();
+				if(val === $password.val()){
+					$password_lock = true;
+				}else{
+					$password_lock = false;
+				}
+			});
+			// 当点击submit的时候 
+			$submit.click(function(e){
+				console.log($username_lock);
+				console.log($password_lock);
+				// 检测用户名  与两个密码是否合适
+				if(!($username_lock && $password_lock)){
+					// 如果进来了 说明有一个不通过 那么阻止默认事件
+					e.preventDefault();
+				}
+			});
+
+		});
+	</script>
+</body>
+</html>

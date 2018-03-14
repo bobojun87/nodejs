@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="/css/reset.css">
+	<link rel="stylesheet" href="/css/common.css">
+	<link rel="stylesheet" href="/css/header.css">
+</head>
+<body>
+	<div id="header">
+		<div class="container clearfix">
+			<div class="logo">
+				<img src="/images/logo.png" alt="">
+			</div>
+			<ul class="nav fl clearfix">
+				<li class="fl"><a href="/all_albums">所有相册</a></li>
+				<li class="fl"><a href="/my_albums">我的相册</a></li>
+				<li class="fl"><a href="/manage_albums">管理相册</a></li>
+			</ul>
+			<div class="user fr clearfix">
+				<p class="username fl">
+					<a href="/update"><span><%=username%></span></a>
+				</p>
+				<p class="head_pic fl">
+					<a href="/head_cut"><img src="<%=head_pic%>" alt=""></a>
+				</p>
+				<p class="exit fl">
+					<a href="/exit">退出</a>
+				</p>
+			</div>
+		</div>
+	</div>
+	<div id="content">
+		<div class="container"></div>
+	</div>
+	<div id="footer">
+		<div class="container">
+			
+		</div>
+	</div>
+</body>
+</html>

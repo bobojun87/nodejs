@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="/css/reset.css">
+	<link rel="stylesheet" href="/css/common.css">
+	<link rel="stylesheet" href="/css/header.css">
+	<link rel="stylesheet" href="/css/content.css">
+</head>
+<body>
+	<div id="header">
+		<div class="container clearfix">
+			<div class="logo">
+				<img src="/images/logo.png" alt="">
+			</div>
+			<ul class="nav fl clearfix">
+				<li class="fl"><a href="/all_albums">所有相册</a></li>
+				<li class="fl"><a href="/my_albums">我的相册</a></li>
+				<li class="fl"><a href="/manage_albums">管理相册</a></li>
+			</ul>
+			<div class="user fr clearfix">
+				<p class="username fl">
+					<a href="/update"><span><%=username%></span></a>
+				</p>
+				<p class="head_pic fl">
+					<a href="/head_cut"><img src="<%=head_pic%>" alt=""></a>
+				</p>
+				<p class="exit fl">
+					<a href="/exit">退出</a>
+				</p>
+			</div>
+		</div>
+	</div>
+	<div id="content">
+		<div class="container">
+			<ul id="list">
+				<li>
+					<h2>修改密码</h2>
+					<label for="password">请输入新密码</label><input id="password" type="password"><input type="button" value="确定修改" id="send">
+				</li>
+				<li>
+					<h2>修改头像</h2>
+					<form>
+						<div>
+							<label for="head_pic">请选择新头像</label><input type="file" id="head_pic" name="head_pic">
+						</div>
+					</form>
+					<button id="tj">提交</button>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div id="footer">
+		<div class="container">
+			
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/jquery-1.7.2.js"></script>
+	<script type="text/javascript">
+		// 写交互
+		$(function(){
+			// 获取元素
+			var $newPassword = $("#password");
+			var $send = $("#send");
+			$send.click(function(){
+				// 获取$newPassword的内容 经过非空判定  正则判定 
+				var password = $newPassword.val();
+				console.log(password);
+				if(!password){
+					return;
+				}
+				if(/^[a-zA-Z_]\w{7,16}$/.test(password)){
+					// 如果进来了 说明符合要求
+					// console.log("符合正则表达式的验证");
+					// 发送ajax 
+					$.ajax({
+						url: "/password_update",
+						type: "post",
+						dataType: "json",
+						data: {
+							password: password
+						},
+						success: function(data){
+							if(!data.error){
+								location.href="/html/login.html";
+							}
+						}
+					});
+				}
+			});
+			// 获取元素
+			var $tj = $("#tj");
+			$tj.click(function(){
+				// 发送ajax 将表单使用FormData初始化
+				var formdata = new FormData($("form")[0]); 
+				$.ajax({
+					url: "/change_head_pic",
+					type: "post",
+					data: formdata,
+					processData: false,
+					contentType: false,
+					success: function(data){
+						console.log(data);
+					}
+				});
+			});
+		});
+	</script>
+</body>
+</html>

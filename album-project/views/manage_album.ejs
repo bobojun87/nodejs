@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="/css/reset.css">
+	<link rel="stylesheet" href="/css/common.css">
+	<link rel="stylesheet" href="/css/header.css">
+	<link rel="stylesheet" href="/css/content.css">
+</head>
+<body>
+	<div id="header">
+		<div class="container clearfix">
+			<div class="logo">
+				<img src="/images/logo.png" alt="">
+			</div>
+			<ul class="nav fl clearfix">
+				<li class="fl"><a href="/all_albums">所有相册</a></li>
+				<li class="fl"><a href="/my_albums">我的相册</a></li>
+				<li class="fl"><a href="/manage_albums">管理相册</a></li>
+			</ul>
+			<div class="user fr clearfix">
+				<p class="username fl">
+					<a href="/update"><span><%=username%></span></a>
+				</p>
+				<p class="head_pic fl">
+					<a href="/head_cut"><img src="<%=head_pic%>" alt=""></a>
+				</p>
+				<p class="exit fl">
+					<a href="/exit">退出</a>
+				</p>
+			</div>
+		</div>
+	</div>
+	<div id="content">
+		<div class="container">
+			<!-- 管理功能 -->
+			<ul>
+				<li>
+					<h2>创建相册</h2>
+					<div>
+						<input type="text" id="create"><button id="send">创建</button>
+					</div>
+				</li>
+				<li>
+					<h2>相册列表</h2>
+					<ul id="albums_list">
+						<%for(var i = 0; i < arr.length; i++){%>
+							<li>
+								<p class="clearfix">
+									<span class="item_name fl"><%=arr[i]%></span>
+									<span class="item_del fr">&times;</span>
+								</p>
+							</li>
+						<%}%>
+					</ul>
+				</li>
+				<li>
+					<h2>上传文件</h2>
+					<form >
+						<div>
+							<select name="choose" id="choose">
+								<%for(var i = 0; i < arr.length; i++){%>
+							 	<option value="<%=arr[i]%>"><%=arr[i]%></option>
+								<%}%>
+							</select>
+						</div>
+						<div>
+							<input type="file" name="img" id="img">
+						</div>
+					</form>
+					<button id="tj">提交</button>
+				</li>
+				<li class="showImgs">
+					<ul id="showImages" class="clearfix">
+						
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div id="footer">
+		<div class="container">
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/jquery-1.7.2.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			// 获取按钮
+			var $send = $("#send");
+			// 获取输入框
+			var $create = $("#create");
+			// 获取albums_list元素
+			var $albums_list = $("#albums_list");
+			// 获取单选框
+			var $choose = $("#choose");
+			// 获取提交按钮
+			var $tj = $("#tj");
+			// 获取显示图片的容器
+			var $showImages = $("#showImages");
+			// 添加事件
+			$send.click(function(){
+				// 获取输入框的内容
+				var val = $create.val();
+				// console.log(val)
+				$.ajax({
+					url: "/create_album",
+					type: "get",
+					data: {
+						album_name: val
+					},
+					dataType: "json",
+					success: function(data){
+						if(!data.error){
+							// 说明没有错误
+							// 创建一个li
+							var li = document.createElement("li");
+							li.innerHTML = '<p class="clearfix"><span class="item_name fl">' + val +'</span><span class="item_del fr">&times;</span></p>';
+							// 获取列表元素
+							$albums_list.append(li);
+							$create.val("");
+							// 创建一个option
+							var option = '<option value="' + val + '">' + val + '</option>';
+							$choose.append(option);
+						}
+					}
+				});
+			});
+			// 使用委托模式给x添加移除事件
+			$albums_list.on("click", ".item_del", function(){
+				// 查看一下事件是否执行
+				// console.log(this);
+				var me = this;
+				var album_name = $(this).prev().html();
+				// console.log(album_name);
+				$.ajax({
+					url: "/del_album",
+					type: "get",
+					data: {
+						album_name: album_name
+					},
+					dataType: "json",
+					success: function(data){
+						// 如果执行成功了
+						if(!data.error){
+							$(me).parent().parent().remove();
+							$choose.children().each(function(){
+								if($(this).val() === album_name){
+									$(this).remove();
+								}
+							});
+						}
+					}
+				})
+			});
+			// 使用委托模式给相册名称元素添加点击事件 当点击的时候显示该相册下的图片
+			$albums_list.on("click", ".item_name", function(){
+				// 获取相册的名称
+				var album_name = $(this).html();
+				$choose_album = album_name;
+				console.log(album_name);
+				// 发送ajax到后台去请求这些图片
+				$.ajax({
+					url: "/getImages",
+					type: "get",
+					data: {
+						album_name: album_name
+					},
+					dataType: "json",
+					success: function(data){
+						console.log(data);
+						if(!data.error){
+							console.log(data);
+							// 清空原来的
+							$showImages.html("");
+							// 添加新的
+							for(var i = 0; i < data.data.length; i++){
+								var src = data.data[i].username + "/" + data.data[i].album_name + "/" + data.data[i].fileName;
+								 var li = '<li class="fl"><img src="' + src + '" alt="" /><span>' + data.data[i].fileName + '</span><input type="checkbox" ' + (data.data[i].share === "true" ? "checked" : "") + ' /></li>';
+								 $showImages.append(li);
+							}
+						}
+					}
+				});
+			});
+			// 定义所选相册
+			var $choose_album = "";
+			// 使用委托模式给checkbox添加点击事件 每当点击的时候要去数据库中修改图片的状态
+			$showImages.on("click", "input", function(){
+				// 首先我们要知道当前的显示内容是哪个相册的
+				// console.log($choose_album);
+				// 相册就是$choose_album
+				// 其次我们要知道操作的是哪个图片
+				var img_name = $(this).prev().html();
+				// 发送ajax
+				$.ajax({
+					url: "/change_state",
+					type: "get",
+					data: {
+						album_name: $choose_album,
+						img_name: img_name,
+						state: this.checked.toString()
+					},
+					dataType: "json",
+					success: function(data){
+						console.log(data);
+					}
+				});
+			});
+			// 当点击提交按钮的时候 应该使用ajax将form表单内的内容传递到服务器上。
+			$tj.click(function(){
+				// 之前的ajax不能提交文件， 现在可以了 因为ajax2.0中有相关规定
+				// 新版本的浏览器可以支持一个FormData的构造函数。它表示的是将表单内的内容格式化成一个FormData类型的对象。ajax发送的数据就是FormData对象了
+				// 定义该对象
+				var formData = new FormData(document.forms[0]);
+				console.log(formData);
+				$.ajax({
+					url: "/uploads",
+					type: "post",
+					data: formData,
+					dataType: "json",
+					processData: false,// processData属性默认是true 会自动的将data数据序列化
+					contentType: false,
+					success: function(data){
+						if(!data.error){
+							$choose.val("");
+							$("#img").val("");
+						}else{
+							alert("上传失败");
+						}
+					}
+				})
+			});
+		});
+
+	</script>
+</body>
+</html>

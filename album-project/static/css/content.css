@@ -1,0 +1,57 @@
+#content{
+
+}
+#content .container{
+
+}
+#content .container ul{
+	width: 800px;
+	margin: 0 auto;
+}
+#content .container ul li{
+	text-align: center;
+}
+#content .container ul li h2{
+	width: 80px;
+	margin: 0 auto;
+	font-size: 20px;
+	text-align: center;
+	padding: 10px 0;
+}
+#content .container ul li div{
+}
+#content .container ul li ul{
+
+}
+#content .container ul li ul li{
+}
+#content .container ul li ul li p{
+	width: 100px;
+	margin: 0 auto;
+}
+#showImages li{
+	position: relative;
+	width: 25%;
+	height: 100px;
+	margin-bottom: 40px;
+}
+#showImages li img{
+	max-width: 100%;
+	max-height: 100%;
+}
+#showImages li span{
+	position: absolute;
+	bottom: -20px;
+	left: 50%;
+	transform: translateX(-50%);
+}
+#showImages li input{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 20px;
+	height: 20px;
+	margin-left: -10px;
+	margin-top: -10px;
+	/*transform: translateX(-50%) translateY(-50%);*/
+}

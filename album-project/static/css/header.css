@@ -1,0 +1,37 @@
+#header{
+	height: 100px;
+}
+#header .container{
+	height: 100%;
+}
+#header .container .logo{
+	height: 100%;
+	float: left;
+}
+#header .container .logo img{
+	height: 100%;
+}
+#header .container .nav{
+	width: 300px;
+	height: 100%;
+}
+#header .container .nav li{
+	width: 100px;
+	text-align: center;
+	line-height: 100px;
+}
+#header .container .nav li a{
+	text-decoration: none;
+}
+#header .container .user{
+	width: 300px;
+}
+#header .container .user p{
+	width: 100px;
+	line-height: 100px;
+	text-align: center;
+}
+#header .container .user .head_pic img{
+	max-height: 100%;
+	max-width: 100%;
+}

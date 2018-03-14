@@ -1,0 +1,22 @@
+#content .container ul{
+	width: 900px;
+	margin: 0 auto;
+	margin-top: 50px;
+}
+#content .container ul li{
+	position: relative;
+	width: 25%;
+	height: 100px;
+	text-align: center;
+	margin-bottom: 30px;
+}
+#content .container ul li img{
+	max-width: 100%;
+	max-height: 100%;
+}
+#content .container ul li a{
+	position: absolute;
+	bottom: -20px;
+	left: 50%;
+	transform: translateX(-50%);
+}

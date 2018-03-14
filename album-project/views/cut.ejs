@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="/css/reset.css">
+	<link rel="stylesheet" href="/css/common.css">
+	<link rel="stylesheet" href="/css/header.css">
+	<link rel="stylesheet" href="/css/content.css">
+	<style type="text/css">
+		*{
+			margin: 0;
+			padding: 0;
+		}
+		#unit{
+			background: url(<%=head_pic%>) no-repeat;
+			margin: 0 auto;
+			border: 1px solid #ccc;
+		}
+		#mengban{
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0,0,0,.3);
+			position: relative;
+		}
+		#area{
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 50px;
+			height: 50px;
+			background: url(<%=head_pic%>) no-repeat;
+		}
+		#dot{
+			position: absolute;
+			width: 10px;
+			height: 10px;
+			background: red;
+			right: -5px;
+			bottom: -5px;
+			border-radius: 50%;
+		}
+		div.btn{
+			text-align: center;
+		}
+		#cut{
+			width: 200px;
+			height: 50px;
+			font-size: 40px;
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<div id="header">
+		<div class="container clearfix">
+			<div class="logo">
+				<img src="/images/logo.png" alt="">
+			</div>
+			<ul class="nav fl clearfix">
+				<li class="fl"><a href="/all_albums">所有相册</a></li>
+				<li class="fl"><a href="/my_albums">我的相册</a></li>
+				<li class="fl"><a href="/manage_albums">管理相册</a></li>
+			</ul>
+			<div class="user fr clearfix">
+				<p class="username fl">
+					<a href="/update"><span><%=username%></span></a>
+				</p>
+				<p class="head_pic fl">
+					<a href="/head_cut" id="head_pic" ><img src="<%=head_pic%>" alt=""></a>
+				</p>
+				<p class="exit fl">
+					<a href="/exit">退出</a>
+				</p>
+			</div>
+		</div>
+	</div>
+	<div id="content">
+		<div id="unit">
+
+			<div id="mengban">
+				<div id="area">
+					<div id="dot"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="btn"><button id="cut">裁剪</button></div>
+	<div id="footer">
+		<div class="container">
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/jquery-1.7.2.js"></script>
+	 <script type="text/javascript">
+		// 获取图片
+		var img = new Image();
+		img.src = "<%=head_pic%>";
+		img.onload = function(){
+			console.log(1);
+			unit.style.width = this.width + "px";
+			unit.style.height = this.height + "px";
+		}
+		// 获取元素
+		var head_pic = $("#head_pic")[0];
+		var unit = $("#unit")[0];
+		var mengban = $("#mengban")[0];
+		var area = $("#area")[0];
+		var dot = $("#dot")[0];
+		var cut = $("#cut")[0];
+		// 添加事件
+		dot.onmousedown = function(e){
+			// 阻止冒泡
+			e.stopPropagation();
+			// 获取 鼠标x y 
+			var m_x = e.clientX;
+			var m_y = e.clientY;
+			// 获取 area宽高
+			var a_w = area.clientWidth;
+			var a_h = area.clientHeight;
+			// 添加鼠标移动事件
+			document.onmousemove = function(e){
+				// 获取鼠标x y
+				var _X = e.clientX;
+				var _Y = e.clientY;
+				// 设置area的宽度和高度
+				area.style.width = a_w + _X - m_x + "px";
+				area.style.height = a_h + _Y - m_y + "px";
+			}
+		}
+		// 鼠标抬起要移除mousemove事件
+		document.onmouseup = function(){
+			document.onmousemove = null;
+		}
+		// 给area添加鼠标按下事件
+		area.onmousedown = function(e){
+			// 获取 鼠标x y 
+			var m_x = e.clientX;
+			var m_y = e.clientY;
+			// 获取area定位值
+			var l = area.offsetLeft;
+			var t = area.offsetTop;
+			// 给document添加onmousemove事件
+			document.onmousemove = function(e){
+				// 获取鼠标移动后的位置
+				var _X = e.clientX;
+				var _Y = e.clientY;
+				// 设置定位值
+				area.style.left = l + _X - m_x + "px";
+				area.style.top = t + _Y - m_y + "px";
+				// 改变背景定位
+				area.style.backgroundPosition = - (l + _X - m_x) + "px " + - (t + _Y - m_y) + "px"
+			}
+		}
+		cut.onclick = function(){
+			// 获取四个值 分别是 x : 裁剪区域的定位left值 y : 裁剪区域的定位top值 w : 裁剪区域的宽度 h : 裁剪区域的高度
+			var x = area.offsetLeft;
+			var y = area.offsetTop;
+			var w = area.clientWidth;
+			var h = area.clientHeight;
+			$.ajax({
+				url: "/cut",
+				type: "get",
+				data: {
+					x: x,
+					y: y,
+					w: w,
+					h: h
+				},
+				dataType:"json",
+				success: function(data){
+					// 重新替换图片即可
+					// 需要替换的有两张图片
+					if(!data.error){
+						alert("图片裁剪成功");
+						// 初始化一张图片 
+						var img = new Image();
+						// 给它一个地址 注意 为了避免缓存 我们给的地址一定要加上后缀
+						img.src = "<%=head_pic%>" + "?" + Math.random() * 10000 ;
+						// 如果两次请求的地址一致，浏览器禁用了缓存还好，如果没禁用，那么会使用缓存的图片内容。导致无法更换图片。
+						// 为了避免这种情况。我们给请求的地址后面加一个?随即数 当这样的请求发送到服务器的时候，虽然指定的资源一致。但是服务器会认为是两次不同的请求。不会让浏览器使用缓存内容
+						// 图片请求回来之后我们要更换头像
+						img.onload = function(){
+							unit.style.width = this.width + "px";
+							unit.style.height = this.height + "px";
+					   	console.log("上树之前", this.width, this.height);
+					   	head_pic.replaceChild(this, head_pic.getElementsByTagName("img")[0]);
+					   	console.log("上树之后", this.width, this.height);
+							unit.style.backgroundImage = "url(<%=head_pic%>" + "?" + Math.random() * 10000 + ")";
+							area.style.backgroundImage = "url(<%=head_pic%>" + "?" + Math.random() * 10000 + ")";
+							area.style.left = 0;
+							area.style.top = 0;
+							area.style.backgroundPositionX = "0px";
+							area.style.backgroundPositionY = "0px";
+						}
+					}
+				}
+			});
+		}
+	</script>
+</body>
+</html>
